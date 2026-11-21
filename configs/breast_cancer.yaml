@@ -1,0 +1,90 @@
+# Paths are relative to project_root, itself relative to this configuration file.
+project_root: ..
+seed: 42
+threads: 4
+paths:
+  raw: data/raw/breast_cancer
+  processed: data/processed/breast_cancer
+  results: results/breast_cancer
+  reference: data/processed/breast_cancer/reference.h5ad
+  spatial: data/processed/breast_cancer/spatial.h5ad
+download:
+  xenium_url: https://cf.10xgenomics.com/samples/xenium/1.0.1/Xenium_FFPE_Human_Breast_Cancer_Rep1/Xenium_FFPE_Human_Breast_Cancer_Rep1_outs.zip
+  reference_url: https://zenodo.org/records/10076046/files/Chromium_FFPE_Human_Breast_Cancer_Chromium_FFPE_Human_Breast_Cancer_count_sample_filtered_feature_bc_matrix.h5?download=1
+  annotation_url: https://zenodo.org/records/10076046/files/Cell_Barcode_Type_Matrices.xlsx?download=1
+preprocessing:
+  spatial_matrix: xenium/cell_feature_matrix.h5
+  spatial_cells: xenium/cells.parquet
+  reference_matrix: reference/filtered_feature_bc_matrix.h5
+  annotations: annotations/Cell_Barcode_Type_Matrices.xlsx
+  spatial_sheet: Xenium R1 Fig1-5 (supervised)
+  reference_sheet: scFFPE-Seq
+  excluded_labels: [Unlabeled, Unassigned, Stromal & T Cell Hybrid, T Cell & Tumor Hybrid]
+validation:
+  fraction: 0.1
+  particles: 5
+  seed: 43
+program_selection:
+  max_programs: 10
+  repeat_seeds: [42, 43, 44, 45, 46]
+  holdout_fraction: 0.1
+  initial_reference_epochs: 50
+  incremental_reference_epochs: 25
+  score_particles: 5
+  p_cutoff: 0.1
+  stability_cutoff: 0.5
+reference:
+  n_hidden: 128
+  batch_size: 128
+  epochs: 750
+  learning_rate: 0.001
+  kl_warmup_epochs: 50
+spatial:
+  n_hidden_expression: 128
+  n_hidden_diffusion: 128
+  n_layers: 2
+  dropout: 0.05
+  batch_size: 512
+  epochs: 300
+  learning_rate: 0.001
+  extra_learning_rate: 0.05
+  adam_eps: 0.0001
+  kl_warmup_epochs: 20
+  n_neighbors: 20
+  dispersion_floor: 0.000001
+  diffusion_epsilon: 0.01
+  training_particles: 5
+  observation_likelihood_weight: 5.0
+  alpha_prior_scale: 5.0
+  prior_proportions_rate: 10.0
+  prior_true_amount: 1.0
+  prior_diffusion_amount: 0.3
+  sparsity_diffusion_prior_mean: 3.0
+  downsample_counts: true
+gamma:
+  sigma_initial: 0.1
+  sigma_rate: 10.0
+export:
+  checkpoint: best
+  predictive_samples: 25
+  activity_samples: 30
+  batch_size: 512
+evaluation:
+  positivity_threshold: 0.5
+  markers:
+    adjusted_p: 0.05
+    logfoldchange: 0.5
+    min_in_fraction: 0.4
+    max_out_fraction: 0.15
+    mecr_top_n: 10
+    display_per_type: 2
+    normalization_total: 1000
+  asw:
+    enabled: true
+    min_counts: 20
+  umap:
+    min_counts: 20
+    normalization_total: 10000
+    n_pcs: 50
+    n_neighbors: 20
+    min_dist: 0.3
