@@ -143,21 +143,6 @@ def replica(task_path):
         heldout_entries=output[2], loadings=output[3]), task_path.parent/"result.pt")
 
 
-def choose_devices(number=1, explicit=None):
-    if explicit:
-        devices = [int(x) for x in explicit.split(",")]
-        if len(set(devices)) != len(devices) or any(x<0 or x>=torch.cuda.device_count() for x in devices):
-            raise ValueError("--devices must contain distinct visible CUDA device indices")
-        return [f"cuda:{i}" for i in devices]
-    if number==0:
-        return ["cpu"]
-    available = torch.cuda.device_count()
-    if not 0<number<=available:
-        raise ValueError(f"Requested {number} GPUs; {available} visible. Set --gpus 0 for CPU.")
-    free = [(torch.cuda.mem_get_info(i)[0], i) for i in range(available)]
-    return [f"cuda:{i}" for _,i in sorted(free, reverse=True)[:number]]
-
-
 def select(cfg, devices, resume=False):
     root = Path(cfg["paths"]["results"])/"program_selection"
     require_empty_stage(root, resume)

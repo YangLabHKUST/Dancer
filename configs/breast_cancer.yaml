@@ -2,6 +2,9 @@
 project_root: ..
 seed: 42
 threads: 4
+gpu_selection:
+  max_used_memory_mib: 512
+  max_utilization_percent: 5
 paths:
   raw: data/raw/breast_cancer
   processed: data/processed/breast_cancer
